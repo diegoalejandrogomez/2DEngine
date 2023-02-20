@@ -1,0 +1,22 @@
+Requirements:
+
+1) Python 3
+2) Pip 3
+3) cmake 3.25 (https://cmake.org/download/)
+
+Platforms:
+Windows
+1) Visual Studio 2019+ for Windows with vc14.2 support (in general what vs suggest is fine)
+
+Mac:
+1) XCode (whatever the latest version is)
+2) command line tools (xcode-select --install)
+
+Linux:
+TODO
+
+How to get dependencies:
+
+1) pip3 install -r requirements.txt
+2) python3 setup.py
+3) Grab a coffee (you can go to starbucks, this will take a while)
