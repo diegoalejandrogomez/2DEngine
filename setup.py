@@ -6,11 +6,16 @@ from sys import platform
 
 
 class Dependency:
-    def __init__(self, name, url, branch, use_configure):
+    def __init__(self, name, url, branch, use_configure, path_to_sln):
         self.name = name
         self.url = url
         self.branch = branch
         self.use_configure = use_configure
+        self.path_to_sln = path_to_sln
+        self.make_required = True
+    
+    def unrequire_make(self):
+        self.make_required = False
     def install(self, path):
         self.dependency_path = os.path.join(path, self.name)
         os.mkdir(self.dependency_path)
@@ -23,19 +28,21 @@ class Dependency:
         dependency_retrieve_process.wait()
     def compile(self):
         self.build_path = os.path.join(self.dependency_path, "build")
-        if os.path.exists(self.build_path):
-            #nuke it, I'll make my own build
-            shutil.rmtree(self.build_path)
-        os.mkdir(self.build_path)
-        if not self.use_configure:
-            cmake_process = subprocess.Popen(['cmake', '..'], cwd=self.build_path)
-            cmake_process.wait()
+        if not os.path.exists(self.build_path):
+            os.mkdir(self.build_path)
+        
+        if (self.make_required or platform != "win32"):
+            if not self.use_configure:
+                cmake_process = subprocess.Popen(['cmake', '..'], cwd=self.build_path)
+                cmake_process.wait()
+            else:
+                configure_process = subprocess.Popen(['../configure'], cwd=self.build_path)
+                configure_process.wait()
+        if (platform == "win32"):
+            make_process = subprocess.Popen(['msbuild', self.path_to_sln, '/property:Platform=x64'], cwd=os.path.join(self.build_path))
         else:
-            configure_process = subprocess.Popen(['../configure'], cwd=self.build_path)
-            configure_process.wait()
-        make_process = subprocess.Popen(['make'], cwd=self.build_path)
-        make_process.wait()
-
+            make_process = subprocess.Popen(['make'], cwd=self.build_path)
+            make_process.wait()
 
 
 class Installer:
@@ -47,8 +54,7 @@ class Installer:
             shutil.rmtree(self.third_party_directory)
         os.mkdir(self.third_party_directory)
 
-    def add_dependency(self, name, url, branch, use_configure):
-        dependency = Dependency(name, url, branch, use_configure)
+    def add_dependency(self, dependency):
         self.dependencies.append(dependency)
     
     def install_dependencies(self):
@@ -68,6 +74,9 @@ class EngineBuilder():
         if platform == "darwin":
             cmake_process = subprocess.Popen(['cmake', '-G', 'Xcode', '..'], cwd=self.build_path)
             cmake_process.wait()
+        if platform == "win32":
+            cmake_process = subprocess.Popen(['cmake', '-G', 'Visual Studio 17 2022', '..'], cwd=self.build_path)
+            cmake_process.wait()
         else:
             cmake_process = subprocess.Popen(['cmake', '..'], cwd=self.build_path)
             cmake_process.wait()
@@ -77,12 +86,18 @@ class EngineBuilder():
         if platform == "darwin":
             engine = subprocess.Popen(['open', 'GameEngine.xcodeproj'], cwd=self.build_path)
             engine.wait()
-#installer = Installer();
+        if platform == "win32":
+            engine = subprocess.Popen(['GameEngine.sln'], cwd=self.build_path)
+            engine.wait()
+
+installer = Installer();
 engine_builder = EngineBuilder();
 
-#installer.add_dependency('wxWidgets', 'https://github.com/wxWidgets/wxWidgets.git', '3.2.2-hotfix', True)
-#installer.add_dependency('SFML', 'https://github.com/SFML/SFML.git', '2.6.x', False)
-#installer.install_dependencies()
+wxWidget = Dependency('wxWidgets', 'https://github.com/wxWidgets/wxWidgets.git', '3.2.2-hotfix', True, 'msw/wx_vc17.sln')
+wxWidget.unrequire_make()
+installer.add_dependency(wxWidget)
+installer.add_dependency(Dependency('SFML', 'https://github.com/SFML/SFML.git', '2.6.x', False, 'SFML.sln'))
+installer.install_dependencies()
 
 engine_builder.compile()
 engine_builder.execute()

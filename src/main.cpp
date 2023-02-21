@@ -1,8 +1,9 @@
 #include "App/HelloWorld.h"
+
+wxIMPLEMENT_APP_CONSOLE(MyApp);
 int main2()
 {
-    MyApp* app = new MyApp();
-    while(true);
+    return 0;
 }
 
 

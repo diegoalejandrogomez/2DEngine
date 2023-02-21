@@ -4,9 +4,12 @@ Requirements:
 2) Pip 3
 3) cmake 3.25 (https://cmake.org/download/)
 
-Platforms:
+Platforms specific:
+
 Windows
-1) Visual Studio 2019+ for Windows with vc14.2 support (in general what vs suggest is fine)
+1) Visual Studio 2019+ for Windows with vc143 support (in general what vs suggest is fine)
+2) Search in google how to install pip
+3) Use it in the Developer command prompt for VS 20x (17+)
 
 Mac:
 1) XCode (whatever the latest version is)
