@@ -2,6 +2,7 @@
 // For compilers that support precompilation, includes "wx/wx.h".
 
 // Diego: I am going to throw all this crap away, I am just testing
+#pragma once
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
     #include <wx/wx.h>

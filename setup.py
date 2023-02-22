@@ -41,7 +41,7 @@ class Dependency:
         if (platform == "win32"):
             make_process = subprocess.Popen(['msbuild', self.path_to_sln, '/property:Platform=x64'], cwd=os.path.join(self.build_path))
         else:
-            make_process = subprocess.Popen(['make'], cwd=self.build_path)
+            make_process = subprocess.Popen(['make', '-j8'], cwd=self.build_path)
             make_process.wait()
 
 
