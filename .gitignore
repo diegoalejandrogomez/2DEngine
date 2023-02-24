@@ -36,3 +36,4 @@ ThirdParty
 build
 .DS_Store
 .vs
+xcode
