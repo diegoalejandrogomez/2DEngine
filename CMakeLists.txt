@@ -12,5 +12,6 @@ set(ROOT_PATH ${CMAKE_SOURCE_DIR})
 set(EDITOR_PATH ${CMAKE_SOURCE_DIR}//Editor)
 set(CORE_PATH ${CMAKE_SOURCE_DIR}//Core)
 
-add_subdirectory(Editor)
+#add_subdirectory(Editor)
+#I need to understand node before automating this here
 add_subdirectory(Core)
