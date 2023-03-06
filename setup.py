@@ -6,23 +6,12 @@ from sys import platform
 
 
 class Dependency:
-    def __init__(self, name, url, branch, use_configure, path_to_sln):
+    def __init__(self, name, use_configure, path_to_sln):
         self.name = name
-        self.url = url
-        self.branch = branch
         self.use_configure = use_configure
         self.path_to_sln = path_to_sln
-        self.make_required = True
-    
-    def unrequire_make(self):
-        self.make_required = False
     def install(self, path):
         self.dependency_path = os.path.join(path, self.name)
-        os.mkdir(self.dependency_path)
-        print("Installing " + self.name + " from: " + self.url + " at: " + self.dependency_path)
-        repo = Repo.clone_from(
-            self.url, self.dependency_path,
-            branch=self.branch)
         #Get dependencies of the dependencies...
         dependency_retrieve_process = subprocess.Popen(['git', 'submodule', 'update', '--init'], cwd=self.dependency_path)
         dependency_retrieve_process.wait()
@@ -31,13 +20,12 @@ class Dependency:
         if not os.path.exists(self.build_path):
             os.mkdir(self.build_path)
         
-        if (self.make_required or platform != "win32"):
-            if not self.use_configure:
-                cmake_process = subprocess.Popen(['cmake', '..'], cwd=self.build_path)
-                cmake_process.wait()
-            else:
+        if (platform != "win32"):
+            if self.use_configure:
                 configure_process = subprocess.Popen(['../configure'], cwd=self.build_path)
                 configure_process.wait()
+            cmake_process = subprocess.Popen(['cmake', '..'], cwd=self.build_path)
+            cmake_process.wait()
         if (platform == "win32"):
             make_process = subprocess.Popen(['msbuild', self.path_to_sln, '/property:Platform=x64'], cwd=os.path.join(self.build_path))
         else:
@@ -49,10 +37,6 @@ class Installer:
     def __init__(self):
         self.dependencies = []
         self.third_party_directory = os.path.join(os.getcwd(), "ThirdParty")
-        if os.path.exists(self.third_party_directory):
-            #nuke it
-            shutil.rmtree(self.third_party_directory)
-        os.mkdir(self.third_party_directory)
 
     def add_dependency(self, dependency):
         self.dependencies.append(dependency)
@@ -92,12 +76,10 @@ class EngineBuilder():
 
 installer = Installer();
 engine_builder = EngineBuilder();
-
-wxWidget = Dependency('wxWidgets', 'https://github.com/wxWidgets/wxWidgets.git', '3.2.2-hotfix', True, 'msw/wx_vc17.sln')
-wxWidget.unrequire_make()
+dependency_retrieve_process = subprocess.Popen(['git', 'submodule', 'update', '--init'])
+dependency_retrieve_process.wait()
+wxWidget = Dependency('wxWidgets', True, 'msw/wx_vc17.sln')
 installer.add_dependency(wxWidget)
-installer.add_dependency(Dependency('SFML', 'https://github.com/SFML/SFML.git', '2.6.x', False, 'SFML.sln'))
-installer.install_dependencies()
-
+installer.install_dependencies();
 engine_builder.compile()
 engine_builder.execute()
