@@ -11,6 +11,8 @@ set(DEPENDENCY_PATH ${CMAKE_SOURCE_DIR}//ThirdParty)
 set(ROOT_PATH ${CMAKE_SOURCE_DIR})
 set(EDITOR_PATH ${CMAKE_SOURCE_DIR}//Editor)
 set(CORE_PATH ${CMAKE_SOURCE_DIR}//Core)
+set(VULKAN_RENDERER_PATH ${CMAKE_SOURCE_DIR}//VulkanRenderer)
 
 add_subdirectory(Editor)
+add_subdirectory(VulkanRenderer)
 add_subdirectory(Core)

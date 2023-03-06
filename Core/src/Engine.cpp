@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "Settings.h"
+#include "VulkanInstance.h"
 using namespace Core;
 
 Engine* Engine::mEngineInstance;
@@ -17,11 +18,14 @@ Engine::~Engine()
 
 void Engine::InitializeSubSystems()
 {
+    VulkanRenderer::VulkanInstance instance;
+    instance.Initialize();
 }
 
 void Engine::Initialize()
 {
     // Read settings from a file
+    InitializeSubSystems();
 }
 
 
